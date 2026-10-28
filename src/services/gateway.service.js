@@ -6,7 +6,7 @@ const { stampImage, applyRateCode } = require('./stamp.service');
 
 async function prepareLocalMediaUrl(task, gwConfig) {
   const source = path.normalize(task.localPath);
-  const publicDir = path.normalize(task.publicPdfDir || gwConfig.publicPdfDir || path.join(process.cwd(), 'temp-pdf-photo'));
+  const publicDir = path.normalize(task.publicPdfDir || gwConfig.publicPdfDir || 'H:\\HTTPSERVER\\PDFS');
 
   if (!fs.existsSync(publicDir)) {
     try { fs.mkdirSync(publicDir, { recursive: true }); } catch (_) {}

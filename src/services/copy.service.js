@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { getConfig } = require('../config');
 const { state, serverLog } = require('./state');
 const { stampImage } = require('./stamp.service');
 
@@ -31,7 +32,11 @@ function handleCopy(req, res, forceMode) {
   }
 
   const sourcePath = path.normalize(src);
-  const destPath = path.normalize(dest);
+  let destPath = path.normalize(dest);
+  if (!path.isAbsolute(destPath)) {
+    const defaultDir = getConfig().gateway.publicPdfDir || 'H:\\HTTPSERVER\\PDFS';
+    destPath = path.join(defaultDir, destPath);
+  }
 
   if (!fs.existsSync(path.dirname(destPath))) {
     try {

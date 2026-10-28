@@ -12,9 +12,9 @@ const DEFAULT_CONFIG = {
     textEndpoint: '/api/messages/send-text',
     fileEndpoint: '/api/messages/send-file',
     pdfBaseUrl: 'https://pdf.infinivps.com/',
-    publicPdfDir: '',
-    defaultDeviceId: '',
-    defaultApiKey: '',
+    publicPdfDir: 'H:\\HTTPSERVER\\PDFS',
+    defaultDeviceId: '918919007019',
+    defaultApiKey: '25a532f3b1f4f698ca4769fd9fb073341db741a0aea2fd6b03f3c9dac8e33518',
     method: 'GET'
   },
   queue: {

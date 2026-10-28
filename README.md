@@ -47,3 +47,4 @@ Web Dashboard opens at: `http://localhost:5555`
 - `GET /copy` - Local image file copy & banner stamping
 - `GET /queue` - WhatsApp image queue
 - `GET /health` - Server health check
+
