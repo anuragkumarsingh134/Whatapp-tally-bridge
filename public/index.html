@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WhatsApp Bridge Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="brand">
+        <i class="fa-brands fa-whatsapp logo-icon"></i>
+        <div><h2>WA Bridge</h2><span class="badge online">ONLINE</span></div>
+      </div>
+      <nav class="nav-links">
+        <button class="nav-item active" data-tab="queue-tab"><i class="fa-solid fa-layer-group"></i> Queue & History</button>
+        <button class="nav-item" data-tab="send-tab"><i class="fa-solid fa-paper-plane"></i> Send Test</button>
+        <button class="nav-item" data-tab="logs-tab"><i class="fa-solid fa-terminal"></i> Live Logs</button>
+        <button class="nav-item" data-tab="settings-tab"><i class="fa-solid fa-gear"></i> Gateway Settings</button>
+      </nav>
+      <div class="sidebar-footer">
+        <small>Port: <span id="portDisplay">5555</span></small><br>
+        <small>Uptime: <span id="uptimeDisplay">0s</span></small>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <section class="stats-grid">
+        <div class="card stat-card">
+          <div class="stat-icon pending"><i class="fa-solid fa-clock"></i></div>
+          <div><h3>Pending Queue</h3><p class="stat-val" id="statPending">0</p></div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-icon success"><i class="fa-solid fa-check"></i></div>
+          <div><h3>Sent Successfully</h3><p class="stat-val" id="statSent">0</p></div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-icon failed"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          <div><h3>Failed</h3><p class="stat-val" id="statFailed">0</p></div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-icon throttle"><i class="fa-solid fa-gauge-high"></i></div>
+          <div><h3>Interval Delay</h3><p class="stat-val" id="statDelay">Adaptive</p></div>
+        </div>
+      </section>
+
+      <!-- TAB 1: Queue & History -->
+      <section id="queue-tab" class="tab-pane active">
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-list-check"></i> Priority Queue & Message History</h3>
+            <div class="card-actions">
+              <button id="btnPause" class="btn btn-warning"><i class="fa-solid fa-pause"></i> Pause Queue</button>
+              <button id="btnClear" class="btn btn-danger"><i class="fa-solid fa-trash"></i> Clear Queue</button>
+            </div>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Priority</th><th>Type</th><th>Recipient</th><th>Payload / Media</th><th>Device ID</th><th>Status</th><th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="queueTableBody">
+                <tr><td colspan="7" class="empty-state">Queue is empty</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: Send Test Message -->
+      <section id="send-tab" class="tab-pane">
+        <div class="card form-card">
+          <div class="card-header"><h3><i class="fa-solid fa-paper-plane"></i> Quick Test Dispatcher</h3></div>
+          <form id="testSendForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Message Type</label>
+                <select id="sendType" class="form-control">
+                  <option value="image">Photo / Image</option>
+                  <option value="text">Plain Text</option>
+                  <option value="pdf">PDF Document</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Priority</label>
+                <select id="sendPriority" class="form-control">
+                  <option value="1">Priority 1 (PDF / Urgent)</option>
+                  <option value="2">Priority 2 (Text / Reminders)</option>
+                  <option value="3" selected>Priority 3 (Photos / Catalogs)</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Recipient Phone Number (with Country Code)</label>
+              <input type="text" id="sendNumber" class="form-control" placeholder="e.g. 919603761820" required>
+            </div>
+            <div class="form-group" id="mediaUrlGroup">
+              <label>Media / PDF / Image URL</label>
+              <input type="url" id="sendMediaUrl" class="form-control" placeholder="https://pdf.infinivps.com/RP%205018%20COMBO.jpeg">
+            </div>
+            <div class="form-group" id="messageGroup" style="display:none;">
+              <label>Message Text</label>
+              <textarea id="sendMessage" class="form-control" rows="3" placeholder="Enter message text..."></textarea>
+            </div>
+            <div class="url-preview-box">
+              <small><i class="fa-solid fa-link"></i> Live Dispatch URL Preview:</small>
+              <code id="urlPreview">Select options to see URL preview...</code>
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i> Enqueue Message</button>
+          </form>
+        </div>
+      </section>
+
+      <!-- TAB 3: Live Real-Time Logs -->
+      <section id="logs-tab" class="tab-pane">
+        <div class="card console-card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-terminal"></i> Real-Time Dispatch Terminal</h3>
+            <button id="btnClearLogs" class="btn btn-secondary btn-sm">Clear Terminal</button>
+          </div>
+          <div class="terminal-body" id="terminalLogs"></div>
+        </div>
+      </section>
+
+      <!-- TAB 4: Gateway Configuration -->
+      <section id="settings-tab" class="tab-pane">
+        <div class="card form-card">
+          <div class="card-header"><h3><i class="fa-solid fa-sliders"></i> Gateway & Bridge Configuration</h3></div>
+          <form id="settingsForm">
+            <div class="form-group">
+              <label>Gateway Base URL (Target Gateway)</label>
+              <input type="text" id="cfgBaseUrl" class="form-control" placeholder="https://api.infinivps.com" required>
+              <small class="field-hint">Never set this to localhost:5555. It must be your actual WhatsApp Gateway URL.</small>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Image Endpoint</label>
+                <input type="text" id="cfgImageEndpoint" class="form-control" placeholder="/api/messages/send-image">
+              </div>
+              <div class="form-group">
+                <label>Text Endpoint</label>
+                <input type="text" id="cfgTextEndpoint" class="form-control" placeholder="/api/messages/send-text">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Default Device ID</label>
+                <input type="text" id="cfgDeviceId" class="form-control" placeholder="918919007019">
+              </div>
+              <div class="form-group">
+                <label>Default API Key</label>
+                <input type="text" id="cfgApiKey" class="form-control" placeholder="API Key token">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Delay Between Messages (ms)</label>
+                <input type="number" id="cfgDelay" class="form-control" placeholder="5000">
+              </div>
+              <div class="form-group">
+                <label>Max Retries</label>
+                <input type="number" id="cfgMaxRetries" class="form-control" placeholder="3">
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Save Settings</button>
+          </form>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/stream.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

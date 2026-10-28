@@ -1,0 +1,6 @@
+node_modules/
+temp-pdf-photo/
+whatsapp_history.json
+*.log
+.DS_Store
+Thumbs.db

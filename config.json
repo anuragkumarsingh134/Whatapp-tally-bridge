@@ -1,0 +1,15 @@
+{
+  "port": 5555,
+  "gateway": {
+    "baseUrl": "https://api.infinivps.com",
+    "imageEndpoint": "/api/messages/send-image",
+    "textEndpoint": "/api/messages/send-text",
+    "defaultDeviceId": "918919007019",
+    "defaultApiKey": "25a532f3b1f4f698ca4769fd9fb073341db741a0aea2fd6b03f3c9dac8e33518",
+    "method": "GET"
+  },
+  "queue": {
+    "delayBetweenMs": 5000,
+    "maxRetries": 3
+  }
+}
