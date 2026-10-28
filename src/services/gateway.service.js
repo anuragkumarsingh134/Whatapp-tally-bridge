@@ -52,6 +52,9 @@ async function prepareLocalMediaUrl(task, gwConfig) {
   } else {
     const dest = path.join(publicDir, fileName);
     try {
+      if (!fs.existsSync(path.dirname(dest))) {
+        fs.mkdirSync(path.dirname(dest), { recursive: true });
+      }
       fs.copyFileSync(source, dest);
       serverLog(`[COPY OK] Copied "${source}" -> "${dest}"`);
       await new Promise((r) => setTimeout(r, 500));
