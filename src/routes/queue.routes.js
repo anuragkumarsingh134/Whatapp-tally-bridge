@@ -9,26 +9,43 @@ function handleQueueMessage(req, res, forceType) {
   const params = { ...req.query, ...req.body };
   const cleanNumber = extractPhoneNumber(params);
 
+  // Normalize case-insensitive parameters from TDL queries
+  const localPath = (params.localPath || params.localpath || params.local_path || params.src || params.filePath || params.filepath || '').trim();
+  const fileName = (params.fileName || params.filename || params.file_name || params.name || '').trim();
+  const publicPdfDir = (params.publicPdfDir || params.publicpdfdir || params.public_pdf_dir || params.publicDir || params.publicdir || '').trim();
+  const publicBaseUrl = (params.publicBaseUrl || params.publicbaseurl || params.public_base_url || '').trim();
+  const targetBaseUrl = (params.targetBaseUrl || params.targetbaseurl || params.target_base_url || '').trim();
+  const stampText = (params.stampText || params.stamptext || params.stamp_text || '').trim();
+  const useRateCode = (params.useRateCode || params.useratecode || params.use_rate_code || '').trim();
+
   let type = forceType || params.type;
   if (!type) {
-    if (params.stampText) type = 'stamp';
-    else if (params.message && !params.fileName && !params.localPath) type = 'text';
+    if (stampText) type = 'stamp';
+    else if (params.message && !fileName && !localPath) type = 'text';
     else {
-      const fn = String(params.fileName || '').toLowerCase();
+      const fn = String(fileName || '').toLowerCase();
       if (fn.endsWith('.pdf')) type = 'pdf';
       else type = 'file';
     }
   }
 
-  const priority = getTaskPriority({ ...params, type });
+  const priority = getTaskPriority({ ...params, type, fileName, localPath });
   const priorityName = getPriorityLabel(priority);
   const historyId = Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
   const item = String(params.item || params.itemId || params.itemName || params.catalog || params.catalogId || '').trim();
+
   const task = {
     ...params,
     id: historyId,
     historyId,
     number: cleanNumber,
+    localPath,
+    fileName,
+    publicPdfDir: publicPdfDir || 'H:\\HTTPSERVER\\PDFS',
+    publicBaseUrl: publicBaseUrl || 'https://pdf.infinivps.com/',
+    targetBaseUrl,
+    stampText,
+    useRateCode,
     item,
     type,
     priority,
@@ -42,7 +59,7 @@ function handleQueueMessage(req, res, forceType) {
     time: new Date().toLocaleString(),
     to: cleanNumber,
     from: task.deviceId || 'Queue-API',
-    file: type === 'text' ? 'Text' : (task.fileName || 'File'),
+    file: type === 'text' ? 'Text' : (fileName || 'File'),
     status: 'Queued',
     error: '',
     taskData: task
@@ -61,4 +78,3 @@ router.all('/queue-stamp', (req, res) => handleQueueMessage(req, res, 'stamp'));
 router.all('/queue-text', (req, res) => handleQueueMessage(req, res, 'text'));
 
 module.exports = router;
-
